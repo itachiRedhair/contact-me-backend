@@ -26,10 +26,6 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Fprintf(w, "Email Address: %s!", e.EmailAdress)
-	fmt.Fprintf(w, "Name: %s!", e.Name)
-	fmt.Fprintf(w, "Message: %s!", e.Message)
-
 	from := mail.NewEmail(e.Name, e.EmailAdress)
 	subject := "Contacted via portfolio website"
 	to := mail.NewEmail("Akshay Milmile", "akshay.milmile@gmail.com")
@@ -41,6 +37,7 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	} else {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, "Status code: %d", response.StatusCode)
 		fmt.Fprintf(w, "Body: %s", response.Body)
 		fmt.Fprintf(w, "Headers: %s", response.Headers)
