@@ -1,4 +1,4 @@
-service: contact-me
+service: contact-me-backend
 
 provider:
   name: google
@@ -21,7 +21,7 @@ package:
     - .git/**
 
 functions:
-  contactme:
+  contactmebackend:
     handler: SendEmail
     events:
       - http: contact

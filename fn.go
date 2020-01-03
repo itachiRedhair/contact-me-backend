@@ -1,4 +1,4 @@
-package main
+package contactmebackend
 
 import (
 	"encoding/json"
