@@ -4,7 +4,7 @@ gomodgen:
 	GO111MODULE=on go mod init
 
 deploy:
-	gcloud functions deploy contactme --entry-point SendEmail --runtime go111 --trigger-http
+	gcloud functions deploy SendEmail --entry-point SendEmail --runtime go111 --trigger-http
 
 delete:
-	gcloud functions delete contactme --entry-point SendEmail --runtime go111 --trigger-http
+	gcloud functions delete SendEmail --entry-point SendEmail --runtime go111 --trigger-http

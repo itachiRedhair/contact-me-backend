@@ -21,7 +21,7 @@ package:
     - .git/**
 
 functions:
-  contactmebackend:
+  first:
     handler: SendEmail
     events:
-      - http: contact
+      - http: dummy-text
