@@ -11,22 +11,24 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
+// Email struct is for the data coming from contact me form
 type email struct {
-	EmailAdress string `json:"emailAddress"`
-	Name        string `json:"name"`
-	Message     string `json:"message"`
+	EmailAddress string `json:"emailAddress"`
+	Name         string `json:"name"`
+	Message      string `json:"message"`
 }
 
 // SendEmail function sents email coming from contact me form of portfolio
 func SendEmail(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var e email
+
 	err := decoder.Decode(&e)
 	if err != nil {
 		panic(err)
 	}
 
-	from := mail.NewEmail(e.Name, e.EmailAdress)
+	from := mail.NewEmail(e.Name, e.EmailAddress)
 	subject := "Contacted via portfolio website"
 	to := mail.NewEmail("Akshay Milmile", "akshay.milmile@gmail.com")
 	plainTextContent := e.Message
@@ -34,12 +36,14 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	response, err := client.Send(message)
 
-	if err != nil {
-		log.Println(err)
+	if response.StatusCode != http.StatusAccepted {
+		if response.StatusCode != http.StatusOK {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("500 - Something bad happened!"))
+		}
 	} else {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		fmt.Fprintf(w, "Status code: %d", response.StatusCode)
-		fmt.Fprintf(w, "Body: %s", response.Body)
-		fmt.Fprintf(w, "Headers: %s", response.Headers)
+		fmt.Fprintf(w, "Success")
 	}
 }
