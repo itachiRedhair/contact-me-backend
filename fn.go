@@ -2,7 +2,6 @@ package contactmebackend
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,39 +10,50 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-// Email struct is for the data coming from contact me form
+// Email struct defines the data coming via REST API
 type email struct {
 	EmailAddress string `json:"emailAddress"`
 	Name         string `json:"name"`
 	Message      string `json:"message"`
 }
 
-// SendEmail function sents email coming from contact me form of portfolio
+// SendEmail function sents email with the data coming from REST API
 func SendEmail(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
 	var e email
-
+	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&e)
+
 	if err != nil {
 		panic(err)
 	}
 
+	// Prepare the email content
 	from := mail.NewEmail(e.Name, e.EmailAddress)
 	subject := "Contacted via portfolio website"
 	to := mail.NewEmail("Akshay Milmile", "akshay.milmile@gmail.com")
 	plainTextContent := e.Message
+
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, plainTextContent)
-	client := sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
+
+	// Get the SendGrid API key from environment variable
+	sendGridAPIKey := os.Getenv("SENDGRID_API_KEY")
+	// Generate a SendGrid Send Client
+	client := sendgrid.NewSendClient(sendGridAPIKey)
+	// Send the message
 	response, err := client.Send(message)
 
 	if response.StatusCode != http.StatusAccepted {
 		if response.StatusCode != http.StatusOK {
+			// Request failed
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("500 - Something bad happened!"))
+			w.Write([]byte("Something bad happened!"))
 		}
 	} else {
+		// Request successful
+
+		// Setting header to allow cors
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		fmt.Fprintf(w, "Success")
+		w.Write([]byte("Success"))
 	}
 }
