@@ -48,6 +48,7 @@ func SendEmail(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Something bad happened!"))
+			w.Write([]byte(err.Error()))
 		}
 	} else {
 		// Request successful
